@@ -47,7 +47,7 @@ class PageClassGenerator {
         break;
 
       case DestinationPage.routeName:
-        builder = (context) => const DestinationPage();
+        builder = (context) =>  DestinationPage(route:  routeSettings.arguments as String,);
         break;
       default:
         builder = (context) => const Material(

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:quind_demo_project/microfronts/destination/pages/destination_page.dart';
 import 'package:quind_demo_project/microfronts/home/js/home_js.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -19,8 +20,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late WebViewController controller;
-
+  bool hasNavigated = false;
   bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +32,14 @@ class _HomePageState extends State<HomePage> {
       ..addJavaScriptChannel('FlutterChannel',
           onMessageReceived: (JavaScriptMessage message) {
         log('Mensaje recibido de JavaScript: ${message.message}');
+        if (!hasNavigated && message.message.startsWith('navigateTo:')) {
+          String href = message.message.replaceFirst('navigateTo:', '');
+          setState(() {
+            hasNavigated = true;
+          });
+          Navigator.pushNamed(context, DestinationPage.routeName,
+              arguments: href);
+        }
       })
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -39,7 +49,7 @@ class _HomePageState extends State<HomePage> {
           onPageStarted: (String url) {
             log('Page started loading: $url');
             setState(() {
-              isLoading = true; 
+              isLoading = true;
             });
           },
           onPageFinished: (String url) {
@@ -47,9 +57,21 @@ class _HomePageState extends State<HomePage> {
 
             controller.runJavaScript(homejsScript).then((_) {
               setState(() {
-                isLoading = false; 
+                isLoading = false;
               });
             });
+
+            String jsScript = '''
+              var articles = document.querySelectorAll('.IndependentHotel_card__y6WUx a');
+              articles.forEach(function(article) {
+                article.addEventListener('click', function(event) {
+                  event.preventDefault(); // Prevenir la navegación predeterminada
+                  var href = article.getAttribute('href');
+                  window.FlutterChannel.postMessage('navigateTo:' + href);
+                });
+              });''';
+
+            controller.runJavaScript(jsScript);
           },
           onHttpError: (HttpResponseError error) {
             log('HTTP error: ${error.response}');
