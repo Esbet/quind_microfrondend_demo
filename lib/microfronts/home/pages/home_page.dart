@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           onPageStarted: (String url) {
             log('Page started loading: $url');
             setState(() {
-              isLoading = true; // Mostrar indicador de carga
+              isLoading = true; 
             });
           },
           onPageFinished: (String url) {
@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
 
             controller.runJavaScript(homejsScript).then((_) {
               setState(() {
-                isLoading = false; // Ocultar indicador de carga
+                isLoading = false; 
               });
             });
           },

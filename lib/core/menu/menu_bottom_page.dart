@@ -21,7 +21,7 @@ class _MenuBottomPageState extends State<MenuBottomPage> {
   bool isvalid = false;
 
   final _controller = PageController();
-  GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
   @override
   void dispose() {
@@ -118,10 +118,6 @@ void _tabIconPressed(int index) {
 
     _controller.jumpToPage(index);
 
-    if (index == 1) {
-      // Aquí puedes agregar lógica adicional si necesitas manejar la navegación de la página de inicio
-      // navigators[index]?.currentState?.pushReplacementNamed(HomePage.routeName);
-    }
   }
 }
 

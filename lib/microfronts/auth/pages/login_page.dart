@@ -21,7 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late WebViewController controller;
 
-  bool isLoading = true; // Indicador de carga// Define tu color aquí
+  bool isLoading = true; 
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         log('Mensaje recibido de JavaScript: ${message.message}');
         if (message.message == 'navigateHome') {
           Navigator.pushNamed(context,
-              HomePage.routeName); // Ajusta esta ruta según sea necesario
+              HomePage.routeName); 
         }
       })
       ..setNavigationDelegate(
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
           onPageStarted: (String url) {
             log('Page started loading: $url');
             setState(() {
-              isLoading = true; // Mostrar indicador de carga
+              isLoading = true; 
             });
           },
           onPageFinished: (String url) {
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       
             controller.runJavaScript(loginjsScript).then((_) {
               setState(() {
-                isLoading = false; // Ocultar indicador de carga
+                isLoading = false; 
               });
             });
           },
@@ -61,11 +61,11 @@ class _LoginPageState extends State<LoginPage> {
             log('HTTP error: ${error.response}');
           },
           onNavigationRequest: (NavigationRequest request) async {
-            final token = await controller.runJavaScriptReturningResult(
+            final  token = await controller.runJavaScriptReturningResult(
                 "sessionStorage.getItem('uxa.visit_id');");
 
             log("token: $token");
-            if (request.url == 'https://www.dropbox.com/') {
+            if (token != "") {
               // ignore: use_build_context_synchronously
               Navigator.pushNamed(context, MenuBottomPage.routeName);
               return NavigationDecision.prevent;
@@ -89,7 +89,7 @@ class _LoginPageState extends State<LoginPage> {
           decoration: const BoxDecoration(
               image: DecorationImage(
             image: AssetImage(
-                loginImage), // Reemplaza con la ruta correcta de tu imagen
+                loginImage), 
             fit: BoxFit.fill,
           )),
           child: Padding(
