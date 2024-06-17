@@ -1,23 +1,22 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:quind_demo_project/core/components/simple_appbar.dart';
-import 'package:quind_demo_project/core/theme/colors.dart';
-import 'package:quind_demo_project/microfronts/destination/js/destination_js.dart';
+import 'package:quind_demo_project/microfronts/favorites/js/favorites_js.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../../core/theme/colors.dart';
 
-class DestinationPage extends StatefulWidget {
-  static const routeName = "/destination";
-  const DestinationPage({super.key, required this.route});
-  final String route;
+class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({super.key});
+  static const routeName = "/";
 
   @override
-  State<DestinationPage> createState() => _DestinationPageState();
+  State<FavoritesPage> createState() => _FavoritesPageState();
 }
 
-class _DestinationPageState extends State<DestinationPage> {
+class _FavoritesPageState extends State<FavoritesPage> {
   late WebViewController controller;
+  bool hasNavigated = false;
   bool isLoading = true;
 
   @override
@@ -29,7 +28,7 @@ class _DestinationPageState extends State<DestinationPage> {
       ..addJavaScriptChannel('FlutterChannel',
           onMessageReceived: (JavaScriptMessage message) {
         log('Mensaje recibido de JavaScript: ${message.message}');
-
+      
       })
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -39,15 +38,15 @@ class _DestinationPageState extends State<DestinationPage> {
           onPageStarted: (String url) {
             log('Page started loading: $url');
             setState(() {
-              isLoading = true; 
+              isLoading = true;
             });
           },
           onPageFinished: (String url) {
             log('Page finished loading: $url');
 
-            controller.runJavaScript(destinationjsScript).then((_) {
+            controller.runJavaScript(favoritesjsScript).then((_) {
               setState(() {
-                isLoading = false; 
+                isLoading = false;
               });
             });
           },
@@ -62,18 +61,21 @@ class _DestinationPageState extends State<DestinationPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://www.trivago.com${widget.route}'));
+      ..loadRequest(Uri.parse('https://www.trivago.com/en-US/profile/favorites'));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldColor,
-      appBar: simpleAppBar(context, 'Destination', null),
-      body:  SafeArea(
+      body: SafeArea(
         child: Column(
           children: [
-             isLoading
+           
+            SizedBox(
+              height: 2.h,
+            ),
+            isLoading
                 ? const Expanded(
                     child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

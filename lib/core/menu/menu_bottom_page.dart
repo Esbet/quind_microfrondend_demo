@@ -40,18 +40,21 @@ class _MenuBottomPageState extends State<MenuBottomPage> {
   }
 
   final pageBuilder = {
-
+    0: PageClassGenerator().buildFavoritesTabPage,
     1: PageClassGenerator().buildHomeTabPage,
-   
+    2: PageClassGenerator().buildProfileTabPage,
   };
 
   final navigators = {
+    0: favoritesTabNavigator,
     1: homeTabNavigator,
-  
+    2: profileTabNavigator,
   };
 
   final navigatorsObservers = {
+    0: homeTabNavigatorObserver,
     1: homeTabNavigatorObserver,
+    2: profileTabNavigatorObserver,
   };
 
   @override
@@ -89,7 +92,7 @@ class _MenuBottomPageState extends State<MenuBottomPage> {
       height: 60.0,
       items: const <Widget>[
         Icon(
-          Icons.calendar_month,
+          Icons.favorite,
           size: 30,
           color: secondColor,
         ),
@@ -106,21 +109,18 @@ class _MenuBottomPageState extends State<MenuBottomPage> {
           _tabIconPressed(index);
         });
       },
- 
     );
   }
 
-void _tabIconPressed(int index) {
-  if (_selectBottomTabIndex != index) {
-    setState(() {
-      _selectBottomTabIndex = index;
-    });
+  void _tabIconPressed(int index) {
+    if (_selectBottomTabIndex != index) {
+      setState(() {
+        _selectBottomTabIndex = index;
+      });
 
-    _controller.jumpToPage(index);
-
+      _controller.jumpToPage(index);
+    }
   }
-}
-
 
   Widget _tab(BuildContext context, int tabIndex) {
     if (pageBuilder.containsKey(tabIndex)) {

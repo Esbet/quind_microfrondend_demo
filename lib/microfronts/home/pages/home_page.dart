@@ -60,18 +60,6 @@ class _HomePageState extends State<HomePage> {
                 isLoading = false;
               });
             });
-
-            String jsScript = '''
-              var articles = document.querySelectorAll('.IndependentHotel_card__y6WUx a');
-              articles.forEach(function(article) {
-                article.addEventListener('click', function(event) {
-                  event.preventDefault(); // Prevenir la navegación predeterminada
-                  var href = article.getAttribute('href');
-                  window.FlutterChannel.postMessage('navigateTo:' + href);
-                });
-              });''';
-
-            controller.runJavaScript(jsScript);
           },
           onHttpError: (HttpResponseError error) {
             log('HTTP error: ${error.response}');
