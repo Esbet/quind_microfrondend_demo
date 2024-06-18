@@ -9,6 +9,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/routes/resource_icons.dart';
+import '../../../core/utils/constants.dart';
 
 class LoginPage extends StatefulWidget {
   static const routeName = "/auth";
@@ -78,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://www.dropbox.com/login'));
+      ..loadRequest(Uri.parse(Constants.dropboxUrl));
   }
 
   @override

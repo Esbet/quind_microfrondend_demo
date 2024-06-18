@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:quind_demo_project/core/utils/constants.dart';
 import 'package:quind_demo_project/microfronts/favorites/js/favorites_js.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -61,7 +62,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://www.trivago.com/en-US/profile/favorites'));
+      ..loadRequest(Uri.parse(Constants.trivagoFavoritesUrl));
   }
 
   @override

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:quind_demo_project/core/components/simple_appbar.dart';
 import 'package:quind_demo_project/core/theme/colors.dart';
+import 'package:quind_demo_project/core/utils/constants.dart';
 import 'package:quind_demo_project/microfronts/destination/js/destination_js.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -62,7 +63,7 @@ class _DestinationPageState extends State<DestinationPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://www.trivago.com${widget.route}'));
+      ..loadRequest(Uri.parse('${Constants.trivagoUrl}${widget.route}'));
   }
 
   @override
