@@ -2,8 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:quind_demo_project/core/utils/constants.dart';
-import 'package:quind_demo_project/microfronts/destination/pages/destination_page.dart';
-import 'package:quind_demo_project/microfronts/home/js/home_js.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
