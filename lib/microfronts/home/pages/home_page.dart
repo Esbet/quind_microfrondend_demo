@@ -1,10 +1,10 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:quind_demo_project/core/utils/constants.dart';
+import 'package:quind_demo_project/microfronts/destination/pages/destination_page.dart';
+import 'package:quind_demo_project/microfronts/home/js/home_js.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import '../../../core/routes/resource_icons.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/fonts.dart';
@@ -31,17 +31,44 @@ class _HomePageState extends State<HomePage> {
       ..addJavaScriptChannel('FlutterChannel',
           onMessageReceived: (JavaScriptMessage message) {
         log('Mensaje recibido de JavaScript: ${message.message}');
+        if (!hasNavigated && message.message.startsWith('navigateTo:')) {
+          String href = message.message.replaceFirst('navigateTo:', '');
+          setState(() {
+            hasNavigated = true;
+          });
+          Navigator.pushNamed(context, DestinationPage.routeName,
+              arguments: href);
+        }
       })
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {},
-          onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
-          onHttpError: (HttpResponseError error) {},
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {
+            log('Page started loading: $url');
+            setState(() {
+              isLoading = true;
+            });
+          },
+          onPageFinished: (String url) {
+            log('Page finished loading: $url');
+
+            controller.runJavaScript(homejsScript).then((_) {
+              setState(() {
+                isLoading = false;
+              });
+            });
+          },
+          onHttpError: (HttpResponseError error) {
+            log('HTTP error: ${error.response}');
+          },
           onNavigationRequest: (NavigationRequest request) {
             return NavigationDecision.navigate;
           },
-          onWebResourceError: (WebResourceError error) {},
+          onWebResourceError: (WebResourceError error) {
+            log('Web resource error: ${error.description}');
+          },
         ),
       )
       ..loadRequest(Uri.parse(Constants.trivagoUrl));
