@@ -160,6 +160,6 @@ class _HomePageState extends State<HomePage> {
   final url = WebUri(Constants.trivagoUrl);
 
   // get cookies
-  List<Cookie> cookies = await cookieManager.getCookies(url: url);
+   await cookieManager.getCookies(url: url);
 }
 }
