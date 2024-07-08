@@ -1,13 +1,13 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:quind_demo_project/core/utils/constants.dart';
-import 'package:quind_demo_project/microfronts/destination/pages/destination_page.dart';
 import 'package:quind_demo_project/microfronts/home/js/home_js.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import '../../../core/routes/resource_icons.dart';
 import '../../../core/theme/colors.dart';
 import '../../../core/theme/fonts.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import '../../destination/pages/destination_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,60 +18,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late WebViewController controller;
-  bool hasNavigated = false;
-  bool isLoading = true;
+  InAppWebViewController? webViewController;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..addJavaScriptChannel('FlutterChannel',
-          onMessageReceived: (JavaScriptMessage message) {
-        log('Mensaje recibido de JavaScript: ${message.message}');
-        if (!hasNavigated && message.message.startsWith('navigateTo:')) {
-          String href = message.message.replaceFirst('navigateTo:', '');
-          setState(() {
-            hasNavigated = true;
-          });
-          Navigator.pushNamed(context, DestinationPage.routeName,
-              arguments: href);
-        }
-      })
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar.
-          },
-          onPageStarted: (String url) {
-            log('Page started loading: $url');
-            setState(() {
-              isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            log('Page finished loading: $url');
+  }
 
-            controller.runJavaScript(homejsScript).then((_) {
-              setState(() {
-                isLoading = false;
-              });
-            });
-          },
-          onHttpError: (HttpResponseError error) {
-            log('HTTP error: ${error.response}');
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            return NavigationDecision.navigate;
-          },
-          onWebResourceError: (WebResourceError error) {
-            log('Web resource error: ${error.description}');
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(Constants.trivagoUrl));
+  @override
+  void dispose() {
+    super.dispose();
+   
   }
 
   @override
@@ -118,19 +76,90 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 2.h,
             ),
-            isLoading
-                ? const Expanded(
-                    child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(child: CircularProgressIndicator()),
-                    ],
-                  ))
-                : Expanded(child: WebViewWidget(controller: controller)),
+            Expanded(
+              child: Stack(
+                children: [
+                  InAppWebView(
+                    initialSettings: InAppWebViewSettings(
+                      clearCache: false,
+                      javaScriptEnabled: true,
+                      safeBrowsingEnabled: true,
+                      useShouldOverrideUrlLoading: true,
+                      supportMultipleWindows: true,
+                      transparentBackground: true,
+                    ),
+                    initialUrlRequest: URLRequest(
+                      url: WebUri(Constants.trivagoUrl),
+                    ),
+                    shouldOverrideUrlLoading:
+                        (controller, navigationAction) async {
+                      // any code;
+                      return NavigationActionPolicy.ALLOW;
+                    },
+                    onWebViewCreated: (controller) {
+                      webViewController = controller;
+                      // Añade el JavaScriptHandler
+                      webViewController!.addJavaScriptHandler(
+                        handlerName: 'flutterHandler',
+                        callback: (args) {
+                          log('Evento recibido de JavaScript: $args');
+                          // Puedes hacer algo con los datos recibidos desde JavaScript
+                          return null;
+                        },
+                      );
+                    },
+                    onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                      if (url.toString().contains("hotel")) {
+                        Navigator.pushReplacementNamed(context, DestinationPage.routeName,
+                            arguments: url.toString());
+                        log('entró');
+                        return;
+                      }
+                    },
+                    onLoadStart: (controller, url) {
+                      log("Started loading: $url");
+                      setState(() {
+                        isLoading = true;
+                      });
+                    },
+                    onLoadStop: (controller, url) {
+                      log("Finished loading: $url");
+
+                      webViewController!
+                          .evaluateJavascript(source: homejsScript)
+                          .then((_) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      });
+                    },
+                  ),
+                  if (isLoading)
+                    Expanded(
+                        child: Container(
+                      color: scaffoldColor,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Center(child: CircularProgressIndicator()),
+                        ],
+                      ),
+                    ))
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
+  void getAllCookies() async {
+  CookieManager cookieManager = CookieManager.instance();
+  final url = WebUri(Constants.trivagoUrl);
+
+  // get cookies
+  List<Cookie> cookies = await cookieManager.getCookies(url: url);
+}
 }
